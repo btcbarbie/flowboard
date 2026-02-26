@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowBoard — Smart Workflow Task Manager</title>
+    <meta name="description" content="A production-quality Kanban-style task management system for modern teams.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- ===== TOP NAVIGATION BAR ===== -->
+    <header class="topbar">
+        <div class="topbar__brand">
+            <svg class="topbar__logo" viewBox="0 0 28 28" fill="none">
+                <rect width="28" height="28" rx="8" fill="#6C5CE7" />
+                <path d="M8 14l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+            <h1 class="topbar__title">FlowBoard</h1>
+        </div>
+        <div class="topbar__actions">
+            <span class="topbar__date" id="currentDate"></span>
+            <button class="btn btn--primary" id="btnNewTask">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+                New Task
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== DASHBOARD METRICS ===== -->
+    <section class="dashboard" id="dashboard">
+        <div class="metric-card" data-metric="total">
+            <div class="metric-card__icon metric-card__icon--total">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <rect x="3" y="3" width="14" height="14" rx="3" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M7 10h6M7 7h6M7 13h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+            </div>
+            <div class="metric-card__body">
+                <span class="metric-card__value" id="metricTotal">0</span>
+                <span class="metric-card__label">Total Tasks</span>
+            </div>
+        </div>
+        <div class="metric-card" data-metric="inprogress">
+            <div class="metric-card__icon metric-card__icon--inprogress">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M10 6v4l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+            </div>
+            <div class="metric-card__body">
+                <span class="metric-card__value" id="metricInProgress">0</span>
+                <span class="metric-card__label">In Progress</span>
+            </div>
+        </div>
+        <div class="metric-card" data-metric="overdue">
+            <div class="metric-card__icon metric-card__icon--overdue">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 6v4M10 14h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5" />
+                </svg>
+            </div>
+            <div class="metric-card__body">
+                <span class="metric-card__value" id="metricOverdue">0</span>
+                <span class="metric-card__label">Overdue</span>
+            </div>
+        </div>
+        <div class="metric-card" data-metric="done">
+            <div class="metric-card__icon metric-card__icon--done">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </div>
+            <div class="metric-card__body">
+                <span class="metric-card__value" id="metricDone">0</span>
+                <span class="metric-card__label">Completed</span>
+            </div>
+        </div>
+        <div class="metric-card" data-metric="highpriority">
+            <div class="metric-card__icon metric-card__icon--high">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 3l7 12H3L10 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+                    <path d="M10 8v3M10 13.5h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                </svg>
+            </div>
+            <div class="metric-card__body">
+                <span class="metric-card__value" id="metricHigh">0</span>
+                <span class="metric-card__label">High Priority</span>
+            </div>
+        </div>
+        <div class="metric-card" data-metric="productivity">
+            <div class="metric-card__icon metric-card__icon--productivity">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M3 17l4-6 3 3 7-10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </div>
+            <div class="metric-card__body">
+                <span class="metric-card__value" id="metricProductivity">0%</span>
+                <span class="metric-card__label">Productivity</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TOOLBAR: SEARCH, FILTERS, SORT ===== -->
+    <section class="toolbar" id="toolbar">
+        <div class="toolbar__search">
+            <svg class="toolbar__search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5" />
+                <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            <input type="text" class="toolbar__input" id="searchInput" placeholder="Search tasks…" autocomplete="off">
+        </div>
+        <div class="toolbar__filters">
+            <select class="toolbar__select" id="filterStatus">
+                <option value="all">All Statuses</option>
+                <option value="backlog">Backlog</option>
+                <option value="inprogress">In Progress</option>
+                <option value="review">Review</option>
+                <option value="done">Done</option>
+            </select>
+            <select class="toolbar__select" id="filterPriority">
+                <option value="all">All Priorities</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+            </select>
+            <select class="toolbar__select" id="filterAssignee">
+                <option value="all">All Assignees</option>
+                <option value="Alex">Alex</option>
+                <option value="Sam">Sam</option>
+                <option value="Jordan">Jordan</option>
+                <option value="Taylor">Taylor</option>
+            </select>
+            <select class="toolbar__select" id="sortBy">
+                <option value="created">Sort: Created</option>
+                <option value="dueDate">Sort: Due Date</option>
+                <option value="priority">Sort: Priority</option>
+            </select>
+        </div>
+    </section>
+
+    <!-- ===== KANBAN BOARD ===== -->
+    <main class="board" id="board">
+        <div class="column" data-status="backlog" id="colBacklog">
+            <div class="column__header">
+                <span class="column__dot column__dot--backlog"></span>
+                <h2 class="column__title">Backlog</h2>
+                <span class="column__count" id="countBacklog">0</span>
+            </div>
+            <div class="column__body" id="listBacklog"></div>
+        </div>
+        <div class="column" data-status="inprogress" id="colInProgress">
+            <div class="column__header">
+                <span class="column__dot column__dot--inprogress"></span>
+                <h2 class="column__title">In Progress</h2>
+                <span class="column__count" id="countInProgress">0</span>
+            </div>
+            <div class="column__body" id="listInProgress"></div>
+        </div>
+        <div class="column" data-status="review" id="colReview">
+            <div class="column__header">
+                <span class="column__dot column__dot--review"></span>
+                <h2 class="column__title">Review</h2>
+                <span class="column__count" id="countReview">0</span>
+            </div>
+            <div class="column__body" id="listReview"></div>
+        </div>
+        <div class="column" data-status="done" id="colDone">
+            <div class="column__header">
+                <span class="column__dot column__dot--done"></span>
+                <h2 class="column__title">Done</h2>
+                <span class="column__count" id="countDone">0</span>
+            </div>
+            <div class="column__body" id="listDone"></div>
+        </div>
+    </main>
+
+    <!-- ===== CREATE / EDIT TASK MODAL ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="taskModal">
+            <div class="modal__header">
+                <h2 class="modal__title" id="modalTitle">New Task</h2>
+                <button class="modal__close" id="btnCloseModal" aria-label="Close modal">&times;</button>
+            </div>
+            <form class="modal__form" id="taskForm" novalidate>
+                <div class="form-row">
+                    <div class="form-group form-group--full">
+                        <label class="form-label" for="taskTitleInput">Title <span class="required">*</span></label>
+                        <input type="text" class="form-input" id="taskTitleInput"
+                            placeholder="e.g. Design new landing page" required>
+                        <span class="form-error" id="errorTitle">Title is required.</span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group form-group--full">
+                        <label class="form-label" for="taskDescInput">Description</label>
+                        <textarea class="form-input form-textarea" id="taskDescInput" rows="3"
+                            placeholder="What needs to be done?"></textarea>
+                    </div>
+                </div>
+                <div class="form-row form-row--2col">
+                    <div class="form-group">
+                        <label class="form-label" for="taskPriority">Priority <span class="required">*</span></label>
+                        <select class="form-input" id="taskPriority" required>
+                            <option value="">Select priority</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                        <span class="form-error" id="errorPriority">Priority is required.</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="taskAssignee">Assignee <span class="required">*</span></label>
+                        <select class="form-input" id="taskAssignee" required>
+                            <option value="">Select assignee</option>
+                            <option value="Alex">Alex</option>
+                            <option value="Sam">Sam</option>
+                            <option value="Jordan">Jordan</option>
+                            <option value="Taylor">Taylor</option>
+                        </select>
+                        <span class="form-error" id="errorAssignee">Assignee is required.</span>
+                    </div>
+                </div>
+                <div class="form-row form-row--2col">
+                    <div class="form-group">
+                        <label class="form-label" for="taskDueDate">Due Date <span class="required">*</span></label>
+                        <input type="date" class="form-input" id="taskDueDate" required>
+                        <span class="form-error" id="errorDueDate">Due date is required.</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="taskEffort">Estimated Effort (hours)</label>
+                        <input type="number" class="form-input" id="taskEffort" min="0" step="0.5" placeholder="e.g. 4">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group form-group--full">
+                        <label class="form-label" for="taskTags">Tags <span class="form-hint">(comma
+                                separated)</span></label>
+                        <input type="text" class="form-input" id="taskTags" placeholder="e.g. design, frontend, urgent">
+                    </div>
+                </div>
+                <!-- Hidden field for editing -->
+                <input type="hidden" id="taskEditId" value="">
+                <div class="modal__footer">
+                    <button type="button" class="btn btn--ghost" id="btnCancelModal">Cancel</button>
+                    <button type="submit" class="btn btn--primary" id="btnSaveTask">Create Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== TASK DETAIL / ACTIVITY MODAL ===== -->
+    <div class="modal-overlay" id="detailOverlay">
+        <div class="modal modal--detail" id="detailModal">
+            <div class="modal__header">
+                <h2 class="modal__title" id="detailTitle">Task Detail</h2>
+                <button class="modal__close" id="btnCloseDetail" aria-label="Close detail">&times;</button>
+            </div>
+            <div class="detail-body" id="detailBody">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
