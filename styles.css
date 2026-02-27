@@ -705,6 +705,24 @@ body {
     transition: all var(--duration) var(--ease);
 }
 
+.task-card__btn--advance {
+    background: var(--primary-bg);
+    color: var(--primary);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    transition: all var(--duration) var(--ease);
+    width: max-content;
+}
+
+.task-card__btn--advance:hover {
+    background: var(--primary-light);
+    color: #fff;
+}
+
 .task-card__btn:hover {
     color: var(--gray-700);
     background: var(--gray-100);

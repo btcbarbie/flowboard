@@ -310,6 +310,24 @@ function buildCardHTML(task) {
         return `<option value="${s}" ${s === task.status ? 'selected' : ''} ${!allowed ? 'disabled' : ''}>${STATUS_LABELS[s]}</option>`;
     }).join('');
 
+    // Determine the primary "next step" based on workflow rules
+    let nextStepHtml = '';
+    const nextStatusMap = {
+        'backlog': 'inprogress',
+        'inprogress': 'review',
+        'review': 'done'
+    };
+
+    const nextStatus = nextStatusMap[task.status];
+    if (nextStatus) {
+        nextStepHtml = `
+            <button class="task-card__btn task-card__btn--advance" data-action="advance" data-task-id="${task.id}" data-next="${nextStatus}" title="Move to ${STATUS_LABELS[nextStatus]}">
+                Move to ${STATUS_LABELS[nextStatus]}
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-left: 4px;"><path d="M5 3l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+        `;
+    }
+
     return `
     <div class="task-card${overdueClass}" draggable="true" data-task-id="${task.id}">
       <div class="task-card__top">
@@ -328,16 +346,21 @@ function buildCardHTML(task) {
         </span>
       </div>
       ${tagsHTML}
-      <div class="task-card__actions">
-        <select class="task-card__status-select" data-action="status" data-task-id="${task.id}">
+      <div class="task-card__actions" style="flex-wrap: wrap;">
+        <select class="task-card__status-select" data-action="status" data-task-id="${task.id}" style="margin-bottom: 4px;">
           ${statusOptions}
         </select>
-        <button class="task-card__btn" data-action="edit" data-task-id="${task.id}" title="Edit">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-        </button>
-        <button class="task-card__btn task-card__btn--delete" data-action="delete" data-task-id="${task.id}" title="Delete">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M6 4V3a1 1 0 011-1h2a1 1 0 011 1v1M5 4v8a1 1 0 001 1h4a1 1 0 001-1V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
+        <div style="display: flex; gap: 4px; width: 100%; justify-content: space-between;">
+            ${nextStepHtml}
+            <div style="display: flex; gap: 4px;">
+                <button class="task-card__btn" data-action="edit" data-task-id="${task.id}" title="Edit">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M11.5 1.5l3 3L5 14H2v-3L11.5 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                </button>
+                <button class="task-card__btn task-card__btn--delete" data-action="delete" data-task-id="${task.id}" title="Delete">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M6 4V3a1 1 0 011-1h2a1 1 0 011 1v1M5 4v8a1 1 0 001 1h4a1 1 0 001-1V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+            </div>
+        </div>
       </div>
     </div>`;
 }
@@ -428,6 +451,9 @@ function initBoardActions() {
                 break;
             case 'edit':
                 openEditModal(taskId);
+                break;
+            case 'advance':
+                changeStatus(taskId, target.dataset.next);
                 break;
             case 'delete':
                 if (confirm('Delete this task? This cannot be undone.')) {
